@@ -95,8 +95,8 @@ main = (iDir, options) ->
     for name, script of scripts
         writeScript out, script
 
-    out.push "\n//# sourceMappingURL=index.js.map.json\n"
-    
+    out.push "//# sourceMappingURL=index.js.map.json\n"
+
     oFile = path.join oDir, "index.js"
     fs.writeFileSync oFile, out.join "\n"
 
@@ -173,20 +173,17 @@ writeScript = (out, script) ->
 
     sourceNode.setSourceContent script.name, script.source
 
-    sourceNode.prepend ";(function(__filename, __dirname, __basename) {\n"
-    sourceNode.add     "\n})(#{fileName}, #{dirName}, #{baseName});"
+    wrappedBefore = "//----- #{script.name}\n;(function(__filename, __dirname, __basename) {\n"
+    wrappedAfter  = "\n})(#{fileName}, #{dirName}, #{baseName});\n"
+
+    wrapped = "#{wrappedBefore}#{script.js}#{wrappedAfter}"
+
+    out.push wrapped
+
+    sourceNode.prepend wrappedBefore
+    sourceNode.add     "#{wrappedAfter}\n" # to account for join w/\n at end
 
     out.sourceNode.add sourceNode
-
-    wrapped = """
-        ;(function(__filename, __dirname, __basename) {
-        #{script.js}
-        })(#{fileName}, #{dirName}, #{baseName});
-    """
-
-    out.push "//----- #{script.name}"
-    out.push wrapped
-    out.push ""
 
 #-------------------------------------------------------------------------------
 processScripts = (files) ->
