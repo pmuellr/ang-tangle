@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html ng-app="app" lang="en">
+
+<!-- ======================================================================= -->
+<head>
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta       name="mobile-web-app-capable" content="yes">
+
+    <link rel="shortcut icon"                href="images/icon-512.png">
+    <link rel="icon"                         href="images/icon-512.png">
+    <link rel="apple-touch-icon-precomposed" href="images/icon-512.png">
+
+    <title>ang-tangle - sample-01</title>
+
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-theme.min.css">
+
+    <style>
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<!-- ======================================================================= -->
+<body>
+
+    <div class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <span class="navbar-brand" href="#/">ang-tangle sample-01</span>
+        </div>    
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-right pull-right">
+                <li><a href="#/">home</a>
+                <li><a href="#/hello">hello</a>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div ng-view></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="vendor/jquery/jquery.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="vendor/angular/angular.js"></script>
+    <script src="index.js"></script>
+
+</body>
+
+</html>
