@@ -18,7 +18,7 @@
 module.exports =
 
     jquery:
-        version: "2.0.3"
+        version: "2.0.x"
         files: 
             "jquery.js":                "."
             "jquery.min.js":            "."
@@ -30,14 +30,12 @@ module.exports =
             "angular.js":               "."
             "angular.min.js":           "."
 
-#    bootstrap: 
-#        version: "3.0.x"
-#        files:
-#            "dist/css/*":               "css"
-#            "dist/fonts/*":             "fonts"
-#            "dist/js/*":                "js"
-#            "assets/js/html5shiv.js":   "js"
-#            "assets/js/respond.min.js": "js"
+    bootstrap: 
+        version: "3.0.x"
+        files:
+            "dist/css/*":               "css"
+            "dist/fonts/*":             "fonts"
+            "dist/js/*":                "js"
 #            
 #    "font-awesome": 
 #        version: "3.2.x"

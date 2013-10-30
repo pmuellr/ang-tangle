@@ -7,10 +7,7 @@
 path          = require "path"
 child_process = require "child_process"
 
-bower_files   = require "./bower-files"
-
 mkdir "-p", "tmp"
-pidFile = "tmp/server.pid"
 
 # base name of this file, for watch()
 __basename    = path.basename __filename
@@ -27,14 +24,22 @@ exports.watch =
     doc: "watch for source file changes, then rebuild"
     run: -> taskWatch()
 
-exports.serve =
-    doc: "run serve on this directory at port 3005"
-    run: -> taskServe()
+exports.clean =
+    doc: "clean up transient files"
+    run: -> taskClean()
 
 #-------------------------------------------------------------------------------
-taskServe = ->
-    server.kill pidFile, ->
-        server.start pidFile, "node_modules/.bin/serve", "-p 3005".split(" ")
+taskClean = ->
+    rm "-rf", "lib"
+    rm "-rf", "tmp"
+
+    rm "-rf", "samples/sample-01/bower"
+    rm "-rf", "samples/sample-01/bower_components"
+    rm "-rf", "samples/sample-01/bower-files.coffee"
+
+    rm "-rf", "samples/sample-02/bower"
+    rm "-rf", "samples/sample-02/bower_components"
+    rm "-rf", "samples/sample-02/bower-files.coffee"
 
 #-------------------------------------------------------------------------------
 taskBuild = ->
@@ -63,7 +68,7 @@ taskWatch =  ->
 
     # watch for changes to sources, run a build
     watch
-        files: ["lib-src/**/*", "samples/**/*"]
+        files: ["lib-src/**/*"]
         run: -> 
             buildNtest()
 
@@ -77,9 +82,7 @@ taskWatch =  ->
 #-------------------------------------------------------------------------------
 buildNtest =  ->
     taskBuild()
-    process.nextTick ->
-        taskTest()
-        taskServe()
+    setTimeout taskTest, 1000
 
 #-------------------------------------------------------------------------------
 coffeec = (src, out) -> 

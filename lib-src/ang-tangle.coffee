@@ -64,7 +64,7 @@ main = (iDir, options) ->
             file = null
         else if dirMatch options.ignore, fileName
             continue
-            
+
         else
             file = getFile(iDir, fileName)
 
@@ -114,8 +114,8 @@ runBower = (iDir, force) ->
         bowerFiles = require bowerFilesName
     catch
         log "creating minimal #{bowerFilesName} module"
-        minBowerFilesName = path.join __dirname, "..", "bower-files.coffee"
-        sh.cp minBowerFilesName, iDir
+        minBowerFilesName = path.join __dirname, "..", "bower-files-template.coffee"
+        sh.cp minBowerFilesName, path.join(iDir, "bower-files.coffee")
 
         bowerFiles = require bowerFilesName
 
@@ -143,7 +143,6 @@ dirMatch = (specs, fileName) ->
     for spec in specs
         spec += "/"
         prefix = fileName.slice 0, spec.length
-        log "dirMatch(#{spec}, #{prefix})"
         return true if spec is prefix
 
     return false
