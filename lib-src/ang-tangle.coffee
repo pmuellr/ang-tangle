@@ -84,7 +84,8 @@ main = (iDir, options) ->
 
     scripts = processScripts files
 
-    out = []
+    out            = []
+    out.sourceNode = new sourceMap.SourceNode
 
     initScript = scripts.init
     if initScript?
@@ -94,8 +95,17 @@ main = (iDir, options) ->
     for name, script of scripts
         writeScript out, script
 
+    out.push "\n//# sourceMappingURL=index.js.map.json\n"
+    
     oFile = path.join oDir, "index.js"
     fs.writeFileSync oFile, out.join "\n"
+
+    content = out.sourceNode.toStringWithSourceMap file: "index.js"
+    content = "#{content.map}"
+    content = JSON.stringify JSON.parse(content), null, 4
+
+    oFile += ".map.json"    
+    fs.writeFileSync oFile, content
 
     return
 
@@ -149,9 +159,25 @@ dirMatch = (specs, fileName) ->
 
 #-------------------------------------------------------------------------------
 writeScript = (out, script) ->
+    out.sourceNode
+
     fileName = JSON.stringify script.name
     dirName  = JSON.stringify path.dirname script.name
     baseName = JSON.stringify script.base
+
+    if script.sourceMap
+        smConsumer = new sourceMap.SourceMapConsumer script.sourceMap
+        sourceNode = sourceMap.SourceNode.fromStringWithSourceMap script.js, smConsumer
+    else
+        sourceNode = new sourceMap.SourceNode 1, 1, script.fileName, script.js
+
+    sourceNode.setSourceContent script.name, script.source
+
+    sourceNode.prepend ";(function(__filename, __dirname, __basename) {\n"
+    sourceNode.add     "\n})(#{fileName}, #{dirName}, #{baseName});"
+
+    out.sourceNode.add sourceNode
+
     wrapped = """
         ;(function(__filename, __dirname, __basename) {
         #{script.js}
@@ -187,6 +213,10 @@ processScripts = (files) ->
             catch err
                 error "error compiling CoffeeScript file #{file.full}: #{err}"
 
+            result =
+                js:         result.js
+                sourceMap:  JSON.parse result.v3SourceMap
+
 
         else if file.type is "litcoffee"
             try
@@ -200,8 +230,14 @@ processScripts = (files) ->
             catch err
                 error "error compiling Literate CoffeeScript file #{file.full}: #{err}"
 
-        scripts[file.base]    = files[name]
-        scripts[file.base].js = result.js
+            result =
+                js:         result.js
+                sourceMap:  JSON.parse result.v3SourceMap
+
+        scripts[file.base]           = files[name]
+        scripts[file.base].js        = result.js
+        scripts[file.base].source    = file.contents
+        scripts[file.base].sourceMap = result.sourceMap
 
     return scripts
 
