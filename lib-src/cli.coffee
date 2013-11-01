@@ -17,20 +17,14 @@ cli.main = (args) ->
     help() if args[0] in ["?", "-?", "--?"]
 
     opts = 
-        bower:   [ "b", Boolean ]
-        copy:    [ "c", [path] ]
-        ignore:  [ "i", [path] ]
-        output:  [ "o", path ]
         verbose: [ "v", Boolean ]
         help:    [ "h", Boolean ]
 
-    longOpts = {}
-    for name, opt of opts
-        longOpts[name] = opt[1]
-
+    longOpts  = {}
     shortOpts = {}
     for name, opt of opts
-        shortOpts[opt[0]] = "--#{name}"
+        shortOpts[opt[0]] = "--#{name}" for name, opt of opts
+        longOpts[name]    = opt[1] 
 
     parsed = nopt longOpts, shortOpts, args, 0
 
@@ -39,40 +33,23 @@ cli.main = (args) ->
     args = parsed.argv.remain
     opts = _.pick parsed, _.keys longOpts
 
-    opts.copy   ?= []
-    opts.ignore ?= []
-
     help() if args.length is 0 
     
-    angTangle.run args[0], opts
+    angTangle.run args, opts
 
     return
 
 #-------------------------------------------------------------------------------
 help = ->
     console.log """
-        #{pkg.name} [options] directory
+        #{pkg.name} [options] input-directory output-file
         
-        directory is a directory of files to ang-tangle-ize
+            input-directory is a directory of files to ang-tangle-ize
+            output-file     is the name of the file to be generated
         
         options:
         
-            -b --bower       re-get bower files based on bower-files module
-            -c --copy dir    copy directory
-            -i --ignore dir  ignore directory
-            -o --output dir  output directory
             -v --verbose     be verbose
-        
-        If you don't specify an output directory, an output directory
-        of <directory>-out willl be used.
-        
-        The --ignore and --copy options may be used multiple times. 
-
-        Directories that are --ignore'd will not be processed or copied into
-        the output directory.
-
-        Directories that are --copy'd will not be processed but will be copied into
-        the output directory.
         
         version: #{pkg.version}; for more info: #{pkg.homepage}    
     """

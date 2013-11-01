@@ -1,0 +1,22 @@
+{
+    "version": 3,
+    "file": "index.js",
+    "sources": [
+        "init.coffee",
+        "routes.coffee",
+        "views/hello.coffee",
+        "views/home.coffee",
+        "--data--.coffee",
+        "--views--.coffee"
+    ],
+    "names": [],
+    "mappings": ";;AAAA,CAAS,IAAT;A;;;;;ACAA,CAAS,CAAwB,CAAjB,GAAhB,EAAQ,CAAS,KAAD;CAEZ;GAAW,KAAX,CAAY;;GAAW,GAAL;KACd;CAAe,CACX,CADJ,WAAc;CACV,CAAW,CAAc,CAAR,EAAjB;EACY,EADZ,EACA;CAHG,KACP;CADJ,EAAW;CAAX,CAKA,YAAc;CAAW,CAAY,CAAZ;CALzB,GAKA;CALA,CAOA;CACS,MAAT;CAVY;A;;;;;ACAhB,CAAS,OAAT,CAAU;CACC,EACH,CADJ,EAAM,GAAN;CACI,CAAO,EAAP;CAFC;;A;;;;;ACAT,CAAS,OAAT,CAAS;A;;;;;ACAT,CAAI,CAAiB,CAAlB,GAAH;A;;;;;ACAA,CAAI,CAAkB,CAAnB,IAAH;CAAsB,CAClB,8CADkB;EAElB,4BAFkB;CAAtB;A",
+    "sourcesContent": [
+        "register \"app\"",
+        "register.config ($routeProvider, views) ->\n\n    addRoute = (name, url=\"/#{name}\") ->\n        $routeProvider.when url,\n            template:  views[\"views/#{name}\"]\n            controller: name\n\n    $routeProvider.otherwise redirectTo: \"/\"\n\n    addRoute \"home\", \"/\"\n    addRoute \"hello\"\n",
+        "register ($scope) ->\n    $scope.text =\n        world: \"WORLD!!!\"\n",
+        "register ->\n",
+        "app.constant \"data\", {}",
+        "app.constant \"views\", {\n    \"views/hello\": \"<p>Hello, <span ng-bind=\\\"text.world\\\"></span>\",\n    \"views/home\": \"<p>Welcome to the home page!\"\n}"
+    ]
+}

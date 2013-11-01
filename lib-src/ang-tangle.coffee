@@ -17,67 +17,36 @@ Version = pkg.version
 Verbose = false
 
 #-------------------------------------------------------------------------------
-exports.run = (dir, options={}) ->
-    error "no dir specified" if  !dir?
+exports.run = ([iDir, oFile], options={}) ->
 
-    if !options.output?
-        options.output = "#{dir}-out"
+    error "no input directory specified" if  !iDir?
+    error "no output file specified"     if  !oFile?
+
+    error "input directory is not a directory: #{iDir}" if !sh.test "-d", iDir
 
     Verbose = !!options.verbose
 
-    main dir, options
+    main iDir, oFile, options
 
     return
 
 #-------------------------------------------------------------------------------
-main = (iDir, options) ->
-    oDir = options.output
+main = (iDir, oFile, options) ->
+    oFileMap = "#{oFile}.map.json"
 
-    logv "iDir:    #{iDir}"
-    logv "oDir:    #{oDir}"
-    logv "options: #{JSON.stringify options, null, 4}"
+    logv "iDir:     #{iDir}"
+    logv "oFile:    #{oFile}"
+    logv "oFileMap: #{oFileMap}"
+    logv "options:  #{JSON.stringify options, null, 4}"
     logv ""
-
-    log "generating files in #{oDir}"
-    sh.mkdir "-p", oDir
-    if !sh.test "-d", oDir
-        error "unable to create directory #{oDir}"
 
     fileNames = sh.ls "-R", iDir
 
-    options.copy.push   "bower"
-    options.ignore.push "bower_components"
-
-    runBower iDir, options.bower
-
     files = {}
     for fileName in fileNames
-        stats = fs.statSync path.join(iDir, fileName)
-        continue unless stats.isFile()
+        file = getFile(iDir, fileName)
 
-        if fileName in ["index.html"]
-            file = null
-        else if fileName in ["bower-files.js", "bower-files.coffee"]
-            continue
-
-        else if dirMatch options.copy, fileName
-            file = null
-        else if dirMatch options.ignore, fileName
-            continue
-
-        else
-            file = getFile(iDir, fileName)
-
-        if !file?
-            iFile = path.join iDir, fileName
-            oFile = path.join oDir, fileName
-
-            sh.mkdir "-p", path.dirname(oFile)
-
-            sh.cp iFile, oFile
-            continue
-
-        files[file.name] = file
+        files[file.name] = file if file?
 
     processData  files
     processViews files
@@ -88,79 +57,33 @@ main = (iDir, options) ->
     out.sourceNode = new sourceMap.SourceNode
 
     initScript = scripts.init
-    if initScript?
-        delete scripts.init
-        writeScript out, initScript
+    error "init script required" unless initScript?
+
+    delete scripts.init
+    writeScript out, initScript
 
     for name, script of scripts
         writeScript out, script
 
-    out.push "//# sourceMappingURL=index.js.map.json\n"
+    out.push "//# sourceMappingURL=#{path.basename oFileMap}\n"
 
-    oFile = path.join oDir, "index.js"
-    fs.writeFileSync oFile, out.join "\n"
+    log "generating: #{oFile}"
 
-    content = out.sourceNode.toStringWithSourceMap file: "index.js"
+    sh.mkdir "-p", path.dirname(oFile)
+    fs.writeFileSync oFile, out.join ""
+
+    log "generating: #{oFileMap}"
+
+    content = out.sourceNode.toStringWithSourceMap file: path.basename(oFile)
     content = "#{content.map}"
     content = JSON.stringify JSON.parse(content), null, 4
 
-    oFile += ".map.json"    
-    fs.writeFileSync oFile, content
+    fs.writeFileSync oFileMap, content
 
     return
 
 #-------------------------------------------------------------------------------
-runBower = (iDir, force) ->
-
-    unless force
-        return if sh.test "-d", path.join(iDir, "bower")
-
-    bowerProgram = sh.which "bower"
-    if !bowerProgram
-        error "bower is not installed"
-
-    bowerFilesName = path.resolve path.join(iDir, "bower-files")
-    try 
-        bowerFiles = require bowerFilesName
-    catch
-        log "creating minimal #{bowerFilesName} module"
-        minBowerFilesName = path.join __dirname, "..", "bower-files-template.coffee"
-        sh.cp minBowerFilesName, path.join(iDir, "bower-files.coffee")
-
-        bowerFiles = require bowerFilesName
-
-    sh.rm "-rf", path.join(iDir, "bower")            if sh.test "-d", path.join(iDir, "bower") 
-    sh.rm "-rf", path.join(iDir, "bower_components") if sh.test "-d", path.join(iDir, "bower_components") 
-
-    origDir = process.cwd()
-    process.chdir iDir
-
-    for pkgName, pkgSpec of bowerFiles
-        process.chdir
-        log "running bower install #{pkgName}##{pkgSpec.version}"
-        sh.exec "bower install #{pkgName}##{pkgSpec.version}"
-
-        for srcFile, dstDir of pkgSpec.files
-            dstDir = path.join "bower", pkgName, dstDir
-            sh.mkdir "-p", dstDir
-            srcFile = path.join "bower_components", pkgName, srcFile
-            sh.cp srcFile, dstDir
-
-    process.chdir origDir
-
-#-------------------------------------------------------------------------------
-dirMatch = (specs, fileName) ->
-    for spec in specs
-        spec += "/"
-        prefix = fileName.slice 0, spec.length
-        return true if spec is prefix
-
-    return false
-
-#-------------------------------------------------------------------------------
 writeScript = (out, script) ->
-    out.sourceNode
-
     fileName = JSON.stringify script.name
     dirName  = JSON.stringify path.dirname script.name
     baseName = JSON.stringify script.base
@@ -174,14 +97,14 @@ writeScript = (out, script) ->
     sourceNode.setSourceContent script.name, script.source
 
     wrappedBefore = "//----- #{script.name}\n;(function(__filename, __dirname, __basename) {\n"
-    wrappedAfter  = "\n})(#{fileName}, #{dirName}, #{baseName});\n"
+    wrappedAfter  = "\n})(#{fileName}, #{dirName}, #{baseName});\n\n"
 
     wrapped = "#{wrappedBefore}#{script.js}#{wrappedAfter}"
 
     out.push wrapped
 
     sourceNode.prepend wrappedBefore
-    sourceNode.add     "#{wrappedAfter}\n" # to account for join w/\n at end
+    sourceNode.add     wrappedAfter
 
     out.sourceNode.add sourceNode
 
@@ -254,16 +177,14 @@ processViews = (files) ->
     for name, file of files
         continue if file.kind isnt "view"
 
-        if views[file.base]?
-            error "duplicate named view files: #{file.full} and #{views[file.base].full}"
-
         if file.type is "html"
             html = file.contents
 
         else if file.type is "md"
             html = marked file.contents
 
-        views[file.base] = html
+        dirBaseName = path.join file.dir, file.base
+        views[dirBaseName] = html
 
     file = 
         name: "--views--.coffee" 
@@ -285,9 +206,6 @@ processData = (files) ->
     for name, file of files
         continue if file.kind isnt "data"
 
-        if data[file.base]?
-            error "duplicate named data files: #{file.full} and #{data[file.base].full}"
-
         if file.type is "cson"
             js = coffee.compile file.content, bare: true
 
@@ -306,7 +224,8 @@ processData = (files) ->
 
         json = JSON.stringify object, null, 4
             
-        data[file.base] = json
+        dirBaseName = path.join file.dir, file.base
+        data[dirBaseName] = json
 
     file = 
         name: "--data--.coffee" 
@@ -322,7 +241,19 @@ processData = (files) ->
     files[file.name] = file
 
 #-------------------------------------------------------------------------------
+Kinds = 
+    js:        "script"
+    coffee:    "script"
+    litcoffee: "script"
+    html:      "view"
+    md:        "view"
+    json:      "data"
+    cson:      "data"
+
+#-------------------------------------------------------------------------------
 getFile = (dir, name) ->
+    return unless sh.test "-f", path.join(dir, name)
+
     switch
         when name.match /.*\.js$/        then type = "js"         
         when name.match /.*\.coffee$/    then type = "coffee"     
@@ -336,26 +267,17 @@ getFile = (dir, name) ->
 
         else return 
 
-    switch
-        when type is "js"         then kind = "script"
-        when type is "coffee"     then kind = "script"
-        when type is "litcoffee"  then kind = "script"
-
-        when type is "html"       then kind = "view"
-        when type is "md"         then kind = "view"
-
-        when type is "json"       then kind = "data"
-        when type is "cson"       then kind = "data"
-
+    kind = Kinds[type]
     full = path.join(dir, name)
-    base = path.basename(name).replace /\.\w*$/, ""
+    dir  = path.dirname name
+    base = path.basename(name).replace /\.[^\.]*$/, ""
 
     try
         contents = fs.readFileSync full, "utf8"
     catch err
         error "error reading file #{full}: #{err}"
 
-    return {name, full, base, type, kind, contents}
+    return {name, full, base, dir, type, kind, contents}
 
 #-------------------------------------------------------------------------------
 log = (message) ->

@@ -7,6 +7,10 @@
 path          = require "path"
 child_process = require "child_process"
 
+bower_files   = require "./bower-files"
+
+samples = ["01", "02", "03"]
+
 mkdir "-p", "tmp"
 
 # base name of this file, for watch()
@@ -16,9 +20,9 @@ exports.build =
     doc: "run a build against the source files"
     run: -> taskBuild()
 
-exports.test =
-    doc: "test the build"
-    run: -> taskTest()
+exports["build-samples"] =
+    doc: "build the samples"
+    run: -> buildSamples()
 
 exports.watch =
     doc: "watch for source file changes, then rebuild"
@@ -28,47 +32,39 @@ exports.clean =
     doc: "clean up transient files"
     run: -> taskClean()
 
+exports["sample-prep"] =
+    doc: "get extra files for samples"
+    run: -> taskSamplePrep()
+
 #-------------------------------------------------------------------------------
 taskClean = ->
     rm "-rf", "lib"
     rm "-rf", "tmp"
-
-    rm "-rf", "samples/sample-01/bower"
-    rm "-rf", "samples/sample-01/bower_components"
-    rm "-rf", "samples/sample-01/bower-files.coffee"
-
-    rm "-rf", "samples/sample-02/bower"
-    rm "-rf", "samples/sample-02/bower_components"
-    rm "-rf", "samples/sample-02/bower-files.coffee"
+    rm "-rf", "bower"
+    rm "-rf", "bower_components"
 
 #-------------------------------------------------------------------------------
 taskBuild = ->
     coffeec "lib-src", "lib"
 
 #-------------------------------------------------------------------------------
-taskTest = ->
-    samples = "01 02".split " "
-
+buildSamples = ->
     for sample in samples
-        mkdir "-p", "tmp/sample-#{sample}" 
-        rm "-rf", "tmp/sample-#{sample}/*" 
-
-        cmd = """
-            node bin/ang-tangle.js 
-                --output tmp/sample-#{sample} 
-                samples/sample-#{sample}
-        """.replace /\s+/g, " "
-
-        log "running #{cmd}"
-        exec cmd
+        buildSample sample
 
 #-------------------------------------------------------------------------------
 taskWatch =  ->
     buildNtest()
 
+    srcs = ["lib-src/**/*"]
+
+    for sample in samples
+        srcs.push "samples/sample-#{sample}/ang/**/*"        
+        srcs.push "samples/sample-#{sample}/index.html"
+
     # watch for changes to sources, run a build
     watch
-        files: ["lib-src/**/*"]
+        files: srcs
         run: -> 
             buildNtest()
 
@@ -80,9 +76,61 @@ taskWatch =  ->
             process.exit 0
 
 #-------------------------------------------------------------------------------
+taskSamplePrep =  ->
+    runBower()
+
+    prepSample sample for sample in samples
+
+#-------------------------------------------------------------------------------
+buildSample =  (num) ->
+    iDir  = "samples/sample-#{num}/ang"
+    oFile = "samples/sample-#{num}/index.js"
+
+    cmd = "node bin/ang-tangle.js #{iDir} #{oFile}"
+
+    log "running #{cmd}"
+    exec cmd
+
+#-------------------------------------------------------------------------------
 buildNtest =  ->
     taskBuild()
-    setTimeout taskTest, 1000
+    setTimeout buildSamples, 1000
+
+#-------------------------------------------------------------------------------
+runBower =  ->
+    bower = which "bower"
+
+    unless bower
+        bower = "./node_modules/.bin/bower"
+
+        unless test "-f", bower
+            logError "bower is not installed globally or locally"
+
+    mkdir "-p", "bower"
+    rm "-rf",   "bower/*"
+
+    for pkgName, pkgSpec of bower_files
+        exec "#{bower} install #{pkgName}##{pkgSpec.version}"
+
+        for srcFile, dstDir of pkgSpec.files
+            srcFile = path.join "bower_components", pkgName, srcFile
+            dstDir  = path.join "bower",            pkgName, dstDir
+
+            mkdir "-p", dstDir
+            cp srcFile, dstDir
+
+#-------------------------------------------------------------------------------
+prepSample = (num) ->
+    dir       = path.join "samples", "sample-#{num}"
+    dirBower  = path.join dir, "bower"
+    dirImages = path.join dir, "images"
+
+    rm "-rf", dirBower  if test "-d", dirBower
+    rm "-rf", dirImages if test "-d", dirImages
+
+    cp "-R", "bower/*",  dirBower
+    cp "-R", "images/*", dirImages
+
 
 #-------------------------------------------------------------------------------
 coffeec = (src, out) -> 

@@ -1,0 +1,22 @@
+{
+    "version": 3,
+    "file": "index.js",
+    "sources": [
+        "init.coffee",
+        "routes.coffee",
+        "views/hello.coffee",
+        "views/home.coffee",
+        "--data--.coffee",
+        "--views--.coffee"
+    ],
+    "names": [],
+    "mappings": ";;AAAA,CAAO,CAA4B,CAAnC,EAAa,CAAP,CAAc;A;;;;;ACApB,CAAI,CAAwB,CAAzB,EAAQ,CAAX,GAAY,KAAD;CAEP;GAAW,KAAX,CAAY;;GAAW,GAAL;KACd;CAAe,CACX,CADJ,WAAc;CACV,CAAW,CAAc,CAAR,EAAjB;EACY,EADZ,EACA;CAHG,KACP;CADJ,EAAW;CAAX,CAKA,YAAc;CAAW,CAAY,CAAZ;CALzB,GAKA;CALA,CAOA;CACS,MAAT;CAVO;A;;;;;ACAX,CAAI,CAAuB,CAAxB,GAAwB,GAAC,CAA5B;CACW,EACH,CADJ,EAAM,GAAN;CACI,CAAO,EAAP;CAFmB;;A;;;;;ACA3B,CAAI,CAAuB,CAAxB,GAAwB,GAAC,CAA5B;A;;;;;ACAA,CAAI,CAAiB,CAAlB,GAAH;A;;;;;ACAA,CAAI,CAAkB,CAAnB,IAAH;CAAsB,CAClB,8CADkB;EAElB,4BAFkB;CAAtB;A",
+    "sourcesContent": [
+        "window.app = angular.module \"app\", []",
+        "app.config ($routeProvider, views) ->\n\n    addRoute = (name, url=\"/#{name}\") ->\n        $routeProvider.when url,\n            template:  views[\"views/#{name}\"]\n            controller: name\n\n    $routeProvider.otherwise redirectTo: \"/\"\n\n    addRoute \"home\", \"/\"\n    addRoute \"hello\"\n",
+        "app.controller __basename, ($scope) ->\n    $scope.text =\n        world: \"WORLD!!!\"\n",
+        "app.controller __basename, ($scope) ->\n",
+        "app.constant \"data\", {}",
+        "app.constant \"views\", {\n    \"views/hello\": \"<p>Hello, <span ng-bind=\\\"text.world\\\"></span>\",\n    \"views/home\": \"<p>Welcome to the home page!\"\n}"
+    ]
+}
