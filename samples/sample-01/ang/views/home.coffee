@@ -1,1 +1,1 @@
-app.controller __basename, ($scope) ->
+app.controller "home", ($scope) ->

@@ -1,89 +1,151 @@
 ang-tangle - WEb aPPLicationS
 ================================================================================
 
-ang-tangle is a tool to easily build the static files for a single-page
-web application with multiple views, using [AngularJS](http://angularjs.org/).
+ang-tangle is a tool and small library that can collect your 
+static JavaScript, HTML, and JSON resources 
+for an [AngularJS](http://angularjs.org/)-based application
+into a single .js file (and associated sourcemap for debugging).
 
-You provide your angular views, controllers, services, directives and 
-filters, along with the "index.html" of the app, along with
-other random files of your choice.
 
 installation
 --------------------------------------------------------------------------------
 
-Install globally via: *(`sudo` not needed for windows)*
+Install globally via: 
+
+    sudo npm -g https://github.com/pmuellr/ang-tangle.git
+
+or maybe the package is on npm at this point and you can use:
 
     sudo npm -g install ang-tangle
 
+*(note: `sudo` not needed for windows)*
+
 This will install a global command `ang-tangle`.
+
+If you just want to use it as a tool within your project, you can of course
+install locally instead of globally (ie, don't use the -g flag).
+
+
 
 what it does
 --------------------------------------------------------------------------------
 
+You run ang-tangle by passing the name of a directory which contains your
+angular JavaScript scripts, HTML files, and JSON data files.  ang-tangle can
+also handle CoffeeScript, Markdown, and CSON files.  
+
+In your project, you should create a new directory to store these angular
+resources; and just these angular resources.
+
+That directory should have one script - `init.js` (or `init.coffee` or `init.litcoffee`),
+which is a script which should create your angular module.
+
+The rest of your angular scripts can be in any directories, but the following 
+ones are special:
+
+    animations/
+    configs/
+    constants/
+    controllers/
+    directives/
+    factories/
+    filters/
+    providers/
+    runs/
+    services/
+    values/
+    views/    // <- for view templates and controller scripts
+
+These names correspond with the methods you can invoke on an angular module
+to build and configuration your application.
+
+Scripts in these directories will be invoked as 
+[IFFE](http://en.wikipedia.org/wiki/Immediately-invoked_function_expression)s,
+passing in two parameters for your use:
+
+* `app` - this is the angular module you created in the `init` script
+* `register()` - a function to register the appropriate thing in your
+  angular script
+
+The `register()` function is also available in the `init` script, and in fact
+needs to be used to register the module that you create:
+
+    register(angular.module("myModule", []))
+
+Then, in a script like `factories/thingee`, you can use the `register` function
+to register a service called `thingee` with the angular module you registered
+in your `init` script, like so:
+
+    register(function() {
+        var shinyNewServiceInstance;
+        //factory function body that constructs shinyNewServiceInstance
+        return shinyNewServiceInstance;
+    });
+
+This is the same thing as doing the following, assuming your module is available
+in the variable `myModule`:
+
+    myModule.factory('thingee', function() {
+        var shinyNewServiceInstance;
+        //factory function body that constructs shinyNewServiceInstance
+        return shinyNewServiceInstance;
+    });
+
+Basically, `register` makes use of the angular module that you registered in 
+the `init` script, the name of the directory the script is in, and the name
+of the script.  Removes some of the boiler-plate-y-ness.
+
+ang-tangle will also take `.html` and `.md` files in the `views` subdirectory,
+and make them available via a service name `views`.  If you will to keep your
+view templates and controllers for those views near each other, you can also
+place controllers in scripts here, and the `register()` function will register
+the specified function as a controller named for the name of the script file.
+
+The `views` service is an object whose properties are the  base names 
+(no directories) of the `.html` or `.md` files, and the values are the 
+contents of the files.  
+
+This makes it easy to do your routing without making the browser fetch the
+templates remotely.  For instance, you might have a script called 
+`configs/routes.js` that looks like this:
+
+    register(function($routeProvider, views) {
+        $routeProvider.otherwise({redirectTo: "/"})
+
+        $routeProvider.when("/page1", {
+            template: views.page1,
+            controller: "page1"
+        })
+
+        $routeProvider.when("/page2", {
+            template: views.page2,
+            controller: "page2"
+        })
+
+ang-tangle will also take `.json` and `.cson` files in any directory, and 
+make them available via a service named `data`.
+
+The `data` service is an object whose properties are the full file names 
+(relative to the main directory) of the `.json` or `.cson` files, and the 
+values are the `JSON.parse()`d objects of those files.
+
+Of course, you don't **need** to use the `register()` if you don't want to,
+but you will need it if you want to make use of the `views` and `data`
+services.  In that case, at least call `register()` in the `init` script to
+register the module.
 
 usage
 --------------------------------------------------------------------------------
 
-    ang-tangle [options] directory
+    ang-tangle [options] input-directory output-file
+        
+        input-directory is a directory of files to ang-tangle-ize
+        output-file     is the name of the file to be generated
+    
+    options:
+    
+        -v --verbose     be verbose
 
-directory is a directory of files to ang-tangle-ize
-
-options:
-
-    -b --bower       re-get bower files based on bower-files module
-    -c --copy dir    copy directory
-    -i --ignore dir  ignore directory
-    -o --output dir  output directory
-    -v --verbose     be verbose
-
-If you don't specify an output directory, an output directory
-of [directory]-out willl be used.
-
-The --ignore and --copy options may be used multiple times. 
-
-Directories that are --ignore'd will not be processed or copied into
-the output directory.
-
-Directories that are --copy'd will not be processed but will be copied into
-the output directory.
-
-Files and directories that begin with "." (eg, ".git") will be --ignore'd
-
-The directory "bower" will be --copy'd and the directory "bower_components"
-will be --ignore'd.  The file "bower-files.coffee" and "bower-files.js" will
-be ignored.
-
-The file "index.html" will be copied.
-
-All the remaining files are subject to processing.
-
-Files with the extension ".html", except for "index.html" are added to an
-angular constant named "views".  The "views" constant is an object whose keys  
-are the base name of the file (no directory, no extension), and the value is
-the content of the file.
-
-Files with the extension ".md" are processed with 
-[`marked`](https://npmjs.org/package/marked) and then treated like ".html" files.
-
-Files with the extension of ".js" will be concatenated into an "index.js"
-file.  The content of the ".js" files will be wrapped with an 
-[IFFE](http://en.wikipedia.org/wiki/Immediately-invoked_function_expression)
-which also passes `__filename`, `__dirname`, and `__basename` as parameters.
-`__filename` is name of the source file relative to the input directory, 
-and `__dirname` is `path.dirname(__filename)`.  `__basename` is the name
-of the source file sans directory and extension.  It's useful to use as 
-the name of the thing you are registering in angular.
-
-Files with the extension of ".coffee" and ".litcoffee" will be compiled into
-JavaScript with [`coffee-script`](https://npmjs.org/package/coffee-script), 
-and then treated like ".js" files.
-
-Files with the extension of ".json" are added to an angular constant named "data".
-The "data" constant is an object whose keys are the base name of the file, and
-the value is the `JSON.parse()` value of the file contents.
-
-Files with the extension of ".cson" are CoffeeScript-formated JSON files.
-They will be evaluated with CoffeeScript and then treated like ".json" files.
 
 
 building `ang-tangle`
@@ -95,20 +157,13 @@ To hack on `ang-tangle` code itself, you should first install
 
 Run `jbuild` by itself in the project directory to see the tasks available.
 
-To rebuild from the source, run `jbuild build`.
-
-To build the samples, run `jbuild test`.
-
-To go into edit-compile mode, run `jbuild watch`, which will
-do a `jbuild build` and then `jbuild test`, and then whenever
-a source file changes will re-run those commands.  FOR EVER.
-
 
 
 `ang-tangle` home
 --------------------------------------------------------------------------------
 
 <https://github.com/pmuellr/ang-tangle>
+
 
 
 license

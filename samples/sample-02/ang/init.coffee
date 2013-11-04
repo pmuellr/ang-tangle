@@ -1,1 +1,1 @@
-register "app"
+AngTangle.module = angular.module "app", []

@@ -44,9 +44,15 @@ main = (iDir, oFile, options) ->
 
     files = {}
     for fileName in fileNames
+        continue unless sh.test "-f", path.join(iDir, fileName)
+
         file = getFile(iDir, fileName)
 
-        files[file.name] = file if file?
+        unless file?
+            log "skipping file: #{path.join iDir, fileName}"
+            continue
+
+        files[file.name] = file
 
     processData  files
     processViews files
@@ -56,6 +62,12 @@ main = (iDir, oFile, options) ->
     out            = []
     out.sourceNode = new sourceMap.SourceNode
 
+    scriptPrefix = ";(function(AngTangle){\n"
+    scriptSuffix = "\n})({});\n"
+
+    out.push           scriptPrefix
+    out.sourceNode.add scriptPrefix
+
     initScript = scripts.init
     error "init script required" unless initScript?
 
@@ -64,6 +76,9 @@ main = (iDir, oFile, options) ->
 
     for name, script of scripts
         writeScript out, script
+
+    out.push           scriptSuffix
+    out.sourceNode.add scriptSuffix
 
     out.push "//# sourceMappingURL=#{path.basename oFileMap}\n"
 
@@ -194,7 +209,7 @@ processViews = (files) ->
         kind: "script" 
 
     file.contents = """
-        app.constant "views", #{JSON.stringify views, null, 4}
+        AngTangle.module.constant "views", #{JSON.stringify views, null, 4}
     """
 
     files[file.name] = file
@@ -203,19 +218,11 @@ processViews = (files) ->
 processData = (files) ->
 
     data = {}
+
     for name, file of files
         continue if file.kind isnt "data"
 
-        if file.type is "cson"
-            js = coffee.compile file.content, bare: true
-
-            try
-                object = eval(js)
-            catch err
-                error "error evaluating cson file #{file.full}: #{err}"
-
-
-        else if file.type is "json"
+        if file.type is "json"
 
             try
                 object = JSON.parse file.contents
@@ -235,7 +242,7 @@ processData = (files) ->
         kind: "script" 
 
     file.contents = """
-        app.constant "data", #{JSON.stringify data, null, 4}
+        AngTangle.module.constant "data", #{JSON.stringify data, null, 4}
     """
 
     files[file.name] = file
@@ -252,8 +259,6 @@ Kinds =
 
 #-------------------------------------------------------------------------------
 getFile = (dir, name) ->
-    return unless sh.test "-f", path.join(dir, name)
-
     switch
         when name.match /.*\.js$/        then type = "js"         
         when name.match /.*\.coffee$/    then type = "coffee"     
@@ -263,7 +268,6 @@ getFile = (dir, name) ->
         when name.match /.*\.md$/        then type = "md"         
 
         when name.match /.*\.json$/      then type = "json"       
-        when name.match /.*\.cson$/      then type = "cson"       
 
         else return 
 

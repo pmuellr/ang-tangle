@@ -1,4 +1,4 @@
-app.service __basename, class Logger
+AngTangle.module.service __basename, class Logger
 
     #---------------------------------------------------------------------------
     constructor: () ->

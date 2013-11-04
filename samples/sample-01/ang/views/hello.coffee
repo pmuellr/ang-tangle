@@ -1,3 +1,3 @@
-app.controller __basename, ($scope) ->
+app.controller "hello", ($scope) ->
     $scope.text =
         world: "WORLD!!!"

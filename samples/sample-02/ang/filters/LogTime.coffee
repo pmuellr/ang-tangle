@@ -1,4 +1,4 @@
-app.filter __basename, ->
+AngTangle.module.filter __basename, ->
     (date) -> 
         hh = right "#{date.getHours()}",   2, 0
         mm = right "#{date.getMinutes()}", 2, 0

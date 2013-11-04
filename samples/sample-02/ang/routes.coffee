@@ -1,4 +1,4 @@
-register.config ($routeProvider, views) ->
+AngTangle.module.config ($routeProvider, views) ->
 
     addRoute = (name, url="/#{name}") ->
         $routeProvider.when url,
@@ -8,4 +8,5 @@ register.config ($routeProvider, views) ->
     $routeProvider.otherwise redirectTo: "/"
 
     addRoute "home", "/"
-    addRoute "hello"
+    addRoute "messages"
+

@@ -1,1 +1,1 @@
-window.app = angular.module "app", []
+window.app = AngTable.module = angular.module "app", []

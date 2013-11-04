@@ -1,4 +1,4 @@
-app.controller __basename, ($scope, Logger) ->
+AngTangle.module.controller __basename, ($scope, Logger) ->
     Logger.log "created body controller"
 
     $scope.messages = Logger.getMessages()

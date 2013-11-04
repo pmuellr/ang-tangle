@@ -9,7 +9,7 @@ child_process = require "child_process"
 
 bower_files   = require "./bower-files"
 
-samples = ["01", "02", "03"]
+samples = ["01", "02"]
 
 mkdir "-p", "tmp"
 
@@ -22,7 +22,7 @@ exports.build =
 
 exports["build-samples"] =
     doc: "build the samples"
-    run: -> buildSamples()
+    run: -> taskBuildSamples()
 
 exports.watch =
     doc: "watch for source file changes, then rebuild"
@@ -48,7 +48,7 @@ taskBuild = ->
     coffeec "lib-src", "lib"
 
 #-------------------------------------------------------------------------------
-buildSamples = ->
+taskBuildSamples = ->
     for sample in samples
         buildSample sample
 
@@ -56,7 +56,9 @@ buildSamples = ->
 taskWatch =  ->
     buildNtest()
 
-    srcs = ["lib-src/**/*"]
+    srcs = [
+        "lib-src/**/*" 
+    ]
 
     for sample in samples
         srcs.push "samples/sample-#{sample}/ang/**/*"        
@@ -94,7 +96,7 @@ buildSample =  (num) ->
 #-------------------------------------------------------------------------------
 buildNtest =  ->
     taskBuild()
-    setTimeout buildSamples, 1000
+    setTimeout taskBuildSamples, 1000
 
 #-------------------------------------------------------------------------------
 runBower =  ->
