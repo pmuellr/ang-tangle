@@ -1,4 +1,4 @@
-AngTangle.module.controller __basename, ($scope, Logger) ->
+AngTangle.controller messages = ($scope, Logger) ->
     Logger.log "created messages controller"
 
     $scope.setSubtitle "messages"

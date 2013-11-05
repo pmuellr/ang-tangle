@@ -1,1 +1,1 @@
-app.controller "home", ($scope) ->
+AngTangle.controller ($scope) ->

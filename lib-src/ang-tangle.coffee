@@ -62,17 +62,21 @@ main = (iDir, oFile, options) ->
     out            = []
     out.sourceNode = new sourceMap.SourceNode
 
-    scriptPrefix = ";(function(AngTangle){\n"
-    scriptSuffix = "\n})({});\n"
+    scriptPrefix = ";(function(){\n"
+    scriptSuffix = "\n})();\n"
 
     out.push           scriptPrefix
     out.sourceNode.add scriptPrefix
 
-    initScript = scripts.init
+    initScript      = scripts["init"]
+    angTangleScript = scripts["--ang-tangle--"]
+
     error "init script required" unless initScript?
 
-    delete scripts.init
-    writeScript out, initScript
+    delete scripts["init"]
+    delete scripts["--ang-tangle--"]
+
+    writeScript out, initScript, angTangleScript
 
     for name, script of scripts
         writeScript out, script
@@ -98,7 +102,23 @@ main = (iDir, oFile, options) ->
     return
 
 #-------------------------------------------------------------------------------
-writeScript = (out, script) ->
+writeScript = (out, script, angTangleScript) ->
+    isInit = false
+
+    if angTangleScript
+        isInit = true
+
+        wrappedBefore = "\n//----- #{angTangleScript.name}\n"
+        wrappedAfter  = "\n"
+
+        out.push wrappedBefore
+        out.push angTangleScript.js
+        out.push wrappedAfter
+
+        out.sourceNode.add wrappedBefore
+        out.sourceNode.add angTangleScript.js
+        out.sourceNode.add wrappedAfter
+
     fileName = JSON.stringify script.name
     dirName  = JSON.stringify path.dirname script.name
     baseName = JSON.stringify script.base
@@ -111,8 +131,14 @@ writeScript = (out, script) ->
 
     sourceNode.setSourceContent script.name, script.source
 
-    wrappedBefore = "//----- #{script.name}\n;(function(__filename, __dirname, __basename) {\n"
-    wrappedAfter  = "\n})(#{fileName}, #{dirName}, #{baseName});\n\n"
+    if isInit
+        errorMessage  = "the init script must call AngTangle.module(name, requires[, configFn]) to create the module"
+        wrappedBefore = "//----- #{script.name}\n;(function(AngTangle) {\n"
+        wrappedAfter  = "\n})(new AngTangle.Init());\nif (!AngTangle.Module) throw Error(#{JSON.stringify(errorMessage)})\n\n"
+
+    else
+        wrappedBefore = "//----- #{script.name}\n;(function(AngTangle) {\n"
+        wrappedAfter  = "\n})(new AngTangle.Script(AngTangle.Module, #{JSON.stringify script.base}));\n\n"
 
     wrapped = "#{wrappedBefore}#{script.js}#{wrappedAfter}"
 
@@ -125,6 +151,18 @@ writeScript = (out, script) ->
 
 #-------------------------------------------------------------------------------
 processScripts = (files) ->
+
+    file = 
+        name: "--ang-tangle--.coffee" 
+        full: "--ang-tangle--.coffee" 
+        base: "--ang-tangle--" 
+        type: "coffee" 
+        kind: "script" 
+
+    fileName = path.join __dirname, "..", "www-src", "ang-tangle.coffee"
+
+    file.contents = fs.readFileSync fileName, "utf8"
+    files[file.name] = file
 
     scripts = {}
     for name, file of files
@@ -208,9 +246,7 @@ processViews = (files) ->
         type: "coffee" 
         kind: "script" 
 
-    file.contents = """
-        AngTangle.module.constant "views", #{JSON.stringify views, null, 4}
-    """
+    file.contents = "AngTangle.constant 'views', #{JSON.stringify views, null, 4}"
 
     files[file.name] = file
 
@@ -229,10 +265,8 @@ processData = (files) ->
             catch err
                 error "invalid JSON in file #{file.full}: #{err}"
 
-        json = JSON.stringify object, null, 4
-            
         dirBaseName = path.join file.dir, file.base
-        data[dirBaseName] = json
+        data[dirBaseName] = object
 
     file = 
         name: "--data--.coffee" 
@@ -241,9 +275,7 @@ processData = (files) ->
         type: "coffee" 
         kind: "script" 
 
-    file.contents = """
-        AngTangle.module.constant "data", #{JSON.stringify data, null, 4}
-    """
+    file.contents = "AngTangle.constant 'data', #{JSON.stringify data, null, 4}"
 
     files[file.name] = file
 

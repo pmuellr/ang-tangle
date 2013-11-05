@@ -1,1 +1,1 @@
-window.app = AngTable.module = angular.module "app", []
+AngTangle.module "app", []

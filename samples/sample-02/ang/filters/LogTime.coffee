@@ -1,5 +1,6 @@
-AngTangle.module.filter __basename, ->
-    (date) -> 
+AngTangle.filter ->
+
+    LogTime = (date) -> 
         hh = right "#{date.getHours()}",   2, 0
         mm = right "#{date.getMinutes()}", 2, 0
         ss = right "#{date.getSeconds()}", 2, 0

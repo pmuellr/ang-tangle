@@ -1,3 +1,3 @@
-app.controller "hello", ($scope) ->
+AngTangle.controller ($scope) ->
     $scope.text =
         world: "WORLD!!!"

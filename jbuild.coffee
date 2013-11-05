@@ -58,6 +58,7 @@ taskWatch =  ->
 
     srcs = [
         "lib-src/**/*" 
+        "www-src/**/*" 
     ]
 
     for sample in samples

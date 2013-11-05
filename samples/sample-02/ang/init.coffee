@@ -1,1 +1,1 @@
-AngTangle.module = angular.module "app", []
+AngTangle.module "app", []

@@ -1,4 +1,4 @@
-AngTangle.module.config ($routeProvider, views) ->
+AngTangle.config routes = ($routeProvider, views) ->
 
     addRoute = (name, url="/#{name}") ->
         $routeProvider.when url,

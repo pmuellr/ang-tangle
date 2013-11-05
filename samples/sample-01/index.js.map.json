@@ -10,13 +10,13 @@
         "--views--.coffee"
     ],
     "names": [],
-    "mappings": ";;;AAAA,CAAO,CAA8C,CAArD,EAA+B,CAAzB,CAAgC,CAAjB;A;;;;;ACArB,CAAI,CAAwB,CAAzB,EAAQ,CAAX,GAAY,KAAD;CAEP;GAAW,KAAX,CAAY;;GAAW,GAAL;KACd;CAAe,CACX,CADJ,WAAc;CACV,CAAW,CAAc,CAAR,EAAjB;EACY,EADZ,EACA;CAHG,KACP;CADJ,EAAW;CAAX,CAKA,YAAc;CAAW,CAAY,CAAZ;CALzB,GAKA;CALA,CAOA;CACS,MAAT;CAVO;A;;;;;ACAX,CAAI,CAAoB,CAArB,GAAqB,CAAxB,EAAyB,CAAzB;CACW,EACH,CADJ,EAAM,GAAN;CACI,CAAO,EAAP;CAFgB;;A;;;;;ACAxB,CAAI,CAAmB,CAApB,GAAH,GAAwB,CAAxB;A;;;;;ACAA,CAAU,CAAwB,IAAlB,EAAhB,CAAS;A;;;;;ACAT,CAAU,CAAyB,IAAnB,CAAhB,EAAS;CAA0B,CAC/B,8CAD+B;EAE/B,4BAF+B;CAAnC;A",
+    "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,CAAU,CAAc,GAAxB,IAAS;A;;;;;;ACAT,CAAU,CAAwB,CAAjB,GAAjB,GAAS,KAAQ;CAEb;GAAW,KAAX,CAAY;;GAAW,GAAL;KACd;CAAe,CACX,CADJ,WAAc;CACV,CAAW,CAAc,CAAR,EAAjB;EACY,EADZ,EACA;CAHG,KACP;CADJ,EAAW;CAAX,CAKA,YAAc;CAAW,CAAY,CAAZ;CALzB,GAKA;CALA,CAOA;CACS,MAAT;CAVa;A;;;;;ACAjB,CAAU,EAAW,MAAZ,CAAT;CACW,EACH,CADJ,EAAM,GAAN;CACI,CAAO,EAAP;CAFa;;A;;;;;ACArB,CAAU,EAAW,MAAZ,CAAT;A;;;;;ACAA,CAAU,CAAiB,IAA3B,GAAS;A;;;;;ACAT,CAAU,CAAkB,KAA5B,EAAS;CAAmB,CACxB,8CADwB;EAExB,4BAFwB;CAA5B;A",
     "sourcesContent": [
-        "window.app = AngTable.module = angular.module \"app\", []",
-        "app.config ($routeProvider, views) ->\n\n    addRoute = (name, url=\"/#{name}\") ->\n        $routeProvider.when url,\n            template:  views[\"views/#{name}\"]\n            controller: name\n\n    $routeProvider.otherwise redirectTo: \"/\"\n\n    addRoute \"home\", \"/\"\n    addRoute \"hello\"\n",
-        "app.controller \"hello\", ($scope) ->\n    $scope.text =\n        world: \"WORLD!!!\"\n",
-        "app.controller \"home\", ($scope) ->\n",
-        "AngTangle.module.constant \"data\", {}",
-        "AngTangle.module.constant \"views\", {\n    \"views/hello\": \"<p>Hello, <span ng-bind=\\\"text.world\\\"></span>\",\n    \"views/home\": \"<p>Welcome to the home page!\"\n}"
+        "AngTangle.module \"app\", []",
+        "AngTangle.config ($routeProvider, views) ->\n\n    addRoute = (name, url=\"/#{name}\") ->\n        $routeProvider.when url,\n            template:  views[\"views/#{name}\"]\n            controller: name\n\n    $routeProvider.otherwise redirectTo: \"/\"\n\n    addRoute \"home\", \"/\"\n    addRoute \"hello\"\n",
+        "AngTangle.controller ($scope) ->\n    $scope.text =\n        world: \"WORLD!!!\"\n",
+        "AngTangle.controller ($scope) ->\n",
+        "AngTangle.constant 'data', {}",
+        "AngTangle.constant 'views', {\n    \"views/hello\": \"<p>Hello, <span ng-bind=\\\"text.world\\\"></span>\",\n    \"views/home\": \"<p>Welcome to the home page!\"\n}"
     ]
 }
