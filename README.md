@@ -13,10 +13,6 @@ installation
 
 Install globally via: 
 
-    sudo npm -g https://github.com/pmuellr/ang-tangle.git
-
-or maybe the package is on npm at this point and you can use:
-
     sudo npm -g install ang-tangle
 
 *(note: `sudo` not needed for windows)*
@@ -120,6 +116,20 @@ usage
     options:
     
         -v --verbose     be verbose
+
+
+
+samples
+--------------------------------------------------------------------------------
+
+There are two sample applications available with the project.  Check the 
+[samples directory](https://github.com/pmuellr/ang-tangle/tree/master/samples).
+
+You should be able to run the finished samples in your browser using the
+awesome [rawgithub.com service](https://rawgithub.com/).
+
+* <https://rawgithub.com/pmuellr/ang-tangle/master/samples/sample-01/index.html>
+* <https://rawgithub.com/pmuellr/ang-tangle/master/samples/sample-02/index.html>
 
 
 
