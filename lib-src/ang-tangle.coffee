@@ -57,7 +57,7 @@ main = (iDir, oFile, options) ->
     processData  iDir, files
     processViews iDir, files
 
-    scripts = processScripts files
+    scripts = processScripts iDir, files
 
     out            = []
     out.sourceNode = new sourceMap.SourceNode
@@ -111,12 +111,15 @@ writeScript = (out, script, angTangleScript) ->
         wrappedBefore = "\n//----- #{angTangleScript.name}\n"
         wrappedAfter  = "\n"
 
+        smConsumer = new sourceMap.SourceMapConsumer angTangleScript.sourceMap
+        sourceNode = sourceMap.SourceNode.fromStringWithSourceMap angTangleScript.js, smConsumer
+
         out.push wrappedBefore
         out.push angTangleScript.js
         out.push wrappedAfter
 
         out.sourceNode.add wrappedBefore
-        out.sourceNode.add angTangleScript.js
+        out.sourceNode.add sourceNode
         out.sourceNode.add wrappedAfter
 
     fileName = JSON.stringify script.name
@@ -150,11 +153,11 @@ writeScript = (out, script, angTangleScript) ->
     out.sourceNode.add sourceNode
 
 #-------------------------------------------------------------------------------
-processScripts = (files) ->
+processScripts = (iDir, files) ->
 
     file =
         name: "--ang-tangle--.coffee"
-        full: "--ang-tangle--.coffee"
+        full: path.join iDir, "--ang-tangle--.coffee"
         base: "--ang-tangle--"
         type: "coffee"
         kind: "script"
@@ -173,7 +176,8 @@ processScripts = (files) ->
 
         if file.type is "js"
             result =
-                js: file.contents
+                js:        file.contents
+                sourceMap: getIdentitySourceMap file
 
         else if file.type is "coffee"
             try
@@ -285,6 +289,28 @@ processData = (iDir, files) ->
     file.contents = "AngTangle.constant 'data', #{JSON.stringify data, null, 4}"
 
     files[file.name] = file
+
+#-------------------------------------------------------------------------------
+getIdentitySourceMap = (file) ->
+    smg = new sourceMap.SourceMapGenerator
+        file: file.full
+
+    lines = file.contents.split("\n").length
+
+    line = 0
+    while line < lines
+        line++
+
+        smg.addMapping
+            source:       file.full
+            original:     { line: line, column: 0 }
+            generated:    { line: line, column: 0 }
+
+
+    srcMap = JSON.parse smg.toString()
+    srcMap.sourcesContent = [file.contents]
+
+    srcMap
 
 #-------------------------------------------------------------------------------
 Kinds =
