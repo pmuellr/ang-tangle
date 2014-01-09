@@ -102,7 +102,7 @@ AngTangle.Script = (function() {
 
 })();
 
-//----- init.coffee
+//----- init.litcoffee
 ;(function(AngTangle) {
 AngTangle.module("app", []);
 

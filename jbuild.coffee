@@ -25,7 +25,7 @@ exports["build-samples"] =
     run: -> taskBuildSamples()
 
 exports.watch =
-    doc: "watch for source file changes, then rebuild"
+    doc: "watch for source file changes, then build, then build-samples"
     run: -> taskWatch()
 
 exports.clean =
@@ -57,24 +57,24 @@ taskWatch =  ->
     buildNtest()
 
     srcs = [
-        "lib-src/**/*" 
-        "www-src/**/*" 
+        "lib-src/**/*"
+        "www-src/**/*"
     ]
 
     for sample in samples
-        srcs.push "samples/sample-#{sample}/ang/**/*"        
+        srcs.push "samples/sample-#{sample}/ang/**/*"
         srcs.push "samples/sample-#{sample}/index.html"
 
     # watch for changes to sources, run a build
     watch
         files: srcs
-        run: -> 
+        run: ->
             buildNtest()
 
     # watch for changes to this file, then exit
     watch
         files: __basename
-        run: -> 
+        run: ->
             log "file #{__basename} changed; exiting"
             process.exit 0
 
@@ -136,7 +136,7 @@ prepSample = (num) ->
 
 
 #-------------------------------------------------------------------------------
-coffeec = (src, out) -> 
+coffeec = (src, out) ->
     log "compiling #{src}/*.coffee to #{out}"
 
     mkdir "-p", "#{out}"
@@ -145,18 +145,18 @@ coffeec = (src, out) ->
     coffee "--compile --bare --output #{out} #{src}/*.coffee"
 
 #-------------------------------------------------------------------------------
-coffee = (cmd) -> 
+coffee = (cmd) ->
     pexec "coffee #{cmd}"
 
 #-------------------------------------------------------------------------------
 # Copyright 2013 Patrick Mueller
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.

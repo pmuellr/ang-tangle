@@ -54,8 +54,8 @@ main = (iDir, oFile, options) ->
 
         files[file.name] = file
 
-    processData  files
-    processViews files
+    processData  iDir, files
+    processViews iDir, files
 
     scripts = processScripts files
 
@@ -152,12 +152,12 @@ writeScript = (out, script, angTangleScript) ->
 #-------------------------------------------------------------------------------
 processScripts = (files) ->
 
-    file = 
-        name: "--ang-tangle--.coffee" 
-        full: "--ang-tangle--.coffee" 
-        base: "--ang-tangle--" 
-        type: "coffee" 
-        kind: "script" 
+    file =
+        name: "--ang-tangle--.coffee"
+        full: "--ang-tangle--.coffee"
+        base: "--ang-tangle--"
+        type: "coffee"
+        kind: "script"
 
     fileName = path.join __dirname, "..", "www-src", "ang-tangle.coffee"
 
@@ -176,36 +176,43 @@ processScripts = (files) ->
                 js: file.contents
 
         else if file.type is "coffee"
-            try 
-                result = coffee.compile file.contents, 
+            try
+                result = coffee.compile file.contents,
                     filename:       file.name
-                    sourceFiles:    [file.name]
+                    sourceFiles:    [file.full]
                     generatedFile:  "index.js"
                     bare:           true
                     sourceMap:      true
             catch err
-                error "error compiling CoffeeScript file #{file.full}: #{err}"
+                loc = "#{err.location.first_line}:#{err.location.first_column}"
+                error "error compiling CoffeeScript file #{file.full}:#{loc}: #{err}"
+
+            v3SourceMap = JSON.parse result.v3SourceMap
+            v3SourceMap.sourcesContent = [file.contents]
 
             result =
                 js:         result.js
-                sourceMap:  JSON.parse result.v3SourceMap
-
+                sourceMap:  v3SourceMap
 
         else if file.type is "litcoffee"
             try
-                result = coffee.compile file.contents, 
+                result = coffee.compile file.contents,
                     filename:       file.name
-                    sourceFiles:    [file.name]
+                    sourceFiles:    [file.full]
                     generatedFile:  "index.js"
                     bare:           true
                     sourceMap:      true
                     literate:       true
             catch err
-                error "error compiling Literate CoffeeScript file #{file.full}: #{err}"
+                loc = "#{err.location.first_line}:#{err.location.first_column}"
+                error "error compiling Literate CoffeeScript file #{file.full}:#{loc}: #{err}"
+
+            v3SsourceMap = JSON.parse result.v3SourceMap
+            v3SsourceMap.sourcesContent = [file.contents]
 
             result =
                 js:         result.js
-                sourceMap:  JSON.parse result.v3SourceMap
+                sourceMap:  v3SsourceMap
 
         scripts[file.base]           = files[name]
         scripts[file.base].js        = result.js
@@ -215,7 +222,7 @@ processScripts = (files) ->
     return scripts
 
 #-------------------------------------------------------------------------------
-processViews = (files) ->
+processViews = (iDir, files) ->
 
     marked.setOptions
         gfm:            true
@@ -239,19 +246,19 @@ processViews = (files) ->
         dirBaseName = path.join file.dir, file.base
         views[dirBaseName] = html
 
-    file = 
-        name: "--views--.coffee" 
-        full: "--views--.coffee" 
-        base: "--views--" 
-        type: "coffee" 
-        kind: "script" 
+    file =
+        name: "--views--.coffee"
+        full: path.join iDir, "--views--.coffee"
+        base: "--views--"
+        type: "coffee"
+        kind: "script"
 
     file.contents = "AngTangle.constant 'views', #{JSON.stringify views, null, 4}"
 
     files[file.name] = file
 
 #-------------------------------------------------------------------------------
-processData = (files) ->
+processData = (iDir, files) ->
 
     data = {}
 
@@ -268,19 +275,19 @@ processData = (files) ->
         dirBaseName = path.join file.dir, file.base
         data[dirBaseName] = object
 
-    file = 
-        name: "--data--.coffee" 
-        full: "--data--.coffee" 
-        base: "--data--" 
-        type: "coffee" 
-        kind: "script" 
+    file =
+        name: "--data--.coffee"
+        full: path.join iDir, "--data--.coffee"
+        base: "--data--"
+        type: "coffee"
+        kind: "script"
 
     file.contents = "AngTangle.constant 'data', #{JSON.stringify data, null, 4}"
 
     files[file.name] = file
 
 #-------------------------------------------------------------------------------
-Kinds = 
+Kinds =
     js:        "script"
     coffee:    "script"
     litcoffee: "script"
@@ -292,16 +299,16 @@ Kinds =
 #-------------------------------------------------------------------------------
 getFile = (dir, name) ->
     switch
-        when name.match /.*\.js$/        then type = "js"         
-        when name.match /.*\.coffee$/    then type = "coffee"     
-        when name.match /.*\.litcoffee$/ then type = "litcoffee"  
+        when name.match /.*\.js$/        then type = "js"
+        when name.match /.*\.coffee$/    then type = "coffee"
+        when name.match /.*\.litcoffee$/ then type = "litcoffee"
 
-        when name.match /.*\.html$/      then type = "html"       
-        when name.match /.*\.md$/        then type = "md"         
+        when name.match /.*\.html$/      then type = "html"
+        when name.match /.*\.md$/        then type = "md"
 
-        when name.match /.*\.json$/      then type = "json"       
+        when name.match /.*\.json$/      then type = "json"
 
-        else return 
+        else return
 
     kind = Kinds[type]
     full = path.join(dir, name)
@@ -378,13 +385,13 @@ align.right = (s, len, pad=" ") -> align s, "right", len, pad
 
 #-------------------------------------------------------------------------------
 # Copyright 2013 Patrick Mueller
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.

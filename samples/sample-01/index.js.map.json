@@ -2,17 +2,17 @@
     "version": 3,
     "file": "index.js",
     "sources": [
-        "init.coffee",
-        "routes.coffee",
-        "views/hello.coffee",
-        "views/home.coffee",
-        "--data--.coffee",
-        "--views--.coffee"
+        "samples/sample-01/ang/init.litcoffee",
+        "samples/sample-01/ang/routes.coffee",
+        "samples/sample-01/ang/views/hello.coffee",
+        "samples/sample-01/ang/views/home.coffee",
+        "samples/sample-01/ang/--data--.coffee",
+        "samples/sample-01/ang/--views--.coffee"
     ],
     "names": [],
-    "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,CAAU,CAAc,GAAxB,IAAS;A;;;;;;ACAT,CAAU,CAAwB,CAAjB,GAAjB,GAAS,KAAQ;CAEb;GAAW,KAAX,CAAY;;GAAW,GAAL;KACd;CAAe,CACX,CADJ,WAAc;CACV,CAAW,CAAc,CAAR,EAAjB;EACY,EADZ,EACA;CAHG,KACP;CADJ,EAAW;CAAX,CAKA,YAAc;CAAW,CAAY,CAAZ;CALzB,GAKA;CALA,CAOA;CACS,MAAT;CAVa;A;;;;;ACAjB,CAAU,EAAW,MAAZ,CAAT;CACW,EACH,CADJ,EAAM,GAAN;CACI,CAAO,EAAP;CAFa;;A;;;;;ACArB,CAAU,EAAW,MAAZ,CAAT;A;;;;;ACAA,CAAU,CAAiB,IAA3B,GAAS;A;;;;;ACAT,CAAU,CAAkB,KAA5B,EAAS;CAAmB,CACxB,8CADwB;EAExB,4BAFwB;CAA5B;A",
+    "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAGI,CAAU,CAAc,GAAxB,IAAS;A;;;;;;ACHb,CAAU,CAAwB,CAAjB,GAAjB,GAAS,KAAQ;CAEb;GAAW,KAAX,CAAY;;GAAW,GAAL;KACd;CAAe,CACX,CADJ,WAAc;CACV,CAAW,CAAc,CAAR,EAAjB;EACY,EADZ,EACA;CAHG,KACP;CADJ,EAAW;CAAX,CAKA,YAAc;CAAW,CAAY,CAAZ;CALzB,GAKA;CALA,CAOA;CACS,MAAT;CAVa;A;;;;;ACAjB,CAAU,EAAW,MAAZ,CAAT;CACW,EACH,CADJ,EAAM,GAAN;CACI,CAAO,EAAP;CAFa;;A;;;;;ACArB,CAAU,EAAW,MAAZ,CAAT;A;;;;;ACAA,CAAU,CAAiB,IAA3B,GAAS;A;;;;;ACAT,CAAU,CAAkB,KAA5B,EAAS;CAAmB,CACxB,8CADwB;EAExB,4BAFwB;CAA5B;A",
     "sourcesContent": [
-        "AngTangle.module \"app\", []",
+        "this is a Literate CoffeeScript file\n------------------------------------\n\n    AngTangle.module \"app\", []\n",
         "AngTangle.config ($routeProvider, views) ->\n\n    addRoute = (name, url=\"/#{name}\") ->\n        $routeProvider.when url,\n            template:  views[\"views/#{name}\"]\n            controller: name\n\n    $routeProvider.otherwise redirectTo: \"/\"\n\n    addRoute \"home\", \"/\"\n    addRoute \"hello\"\n",
         "AngTangle.controller ($scope) ->\n    $scope.text =\n        world: \"WORLD!!!\"\n",
         "AngTangle.controller ($scope) ->\n",
