@@ -1,4 +1,4 @@
-The angular shield came from 
+The angular shield came from
 <https://github.com/angular/angular.js/tree/master/images/logo>
 and is licensed under a
 [Creative Commons Attribution-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-sa/3.0/)

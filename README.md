@@ -1,8 +1,8 @@
 <tt style="color:limegreen">ang-tangle</tt> - tangles source files into an angular application
 ================================================================================
 
-<tt style="color:limegreen">ang-tangle</tt> is a tool that can collect your 
-static JavaScript, HTML, and JSON resources 
+<tt style="color:limegreen">ang-tangle</tt> is a tool that can collect your
+static JavaScript, HTML, and JSON resources
 for an [AngularJS](http://angularjs.org/)-based application
 into a single .js file, and associated sourcemap for debugging.
 
@@ -11,7 +11,7 @@ into a single .js file, and associated sourcemap for debugging.
 installation
 --------------------------------------------------------------------------------
 
-Install globally via: 
+Install globally via:
 
     sudo npm -g install ang-tangle
 
@@ -27,14 +27,14 @@ install locally instead of globally (ie, don't use the -g flag).
 what it does
 --------------------------------------------------------------------------------
 
-You run <tt style="color:limegreen">ang-tangle</tt> by passing the name of a 
-directory which contains your angular JavaScript scripts, HTML files, 
+You run <tt style="color:limegreen">ang-tangle</tt> by passing the name of a
+directory which contains your angular JavaScript scripts, HTML files,
 and JSON data files.  <tt style="color:limegreen">ang-tangle</tt> can
-also handle CoffeeScript and Markdown files.   
+also handle CoffeeScript and Markdown files.
 
 From here in, we'll reference this directory as the "input directory".
 
-In your project, you should create a new directory - the input directory - 
+In your project, you should create a new directory - the input directory -
 to store these angular resources; and just these angular resources.
 <tt style="color:limegreen">ang-tangle</tt>
 doesn't handle images, css files, etc.  It only handles the following files:
@@ -46,24 +46,24 @@ doesn't handle images, css files, etc.  It only handles the following files:
 * `.md`
 * `.json`
 
-The input directory should have at least one script in it - `init.js` 
-(or `init.coffee` or `init.litcoffee`), which is a script which should 
-create your angular module.  
+The input directory should have at least one script in it - `init.js`
+(or `init.coffee` or `init.litcoffee`), which is a script which should
+create your angular module.
 
-The rest of your angular scripts can be in the input directory also, or any 
+The rest of your angular scripts can be in the input directory also, or any
 subdirectory of the input directory.
 
-<tt style="color:limegreen">ang-tangle</tt> will also take 
+<tt style="color:limegreen">ang-tangle</tt> will also take
 `.html` and `.md` files in any directory,
 and make them available via a service named `views`.
-The `views` service is an object whose properties are the names 
-of the `.html` or `.md` files relative to the input directory, 
-and the values are the contents of the files.  
+The `views` service is an object whose properties are the names
+of the `.html` or `.md` files relative to the input directory,
+and the values are the contents of the files.
 
-<tt style="color:limegreen">ang-tangle</tt> will also take 
-`.json` files in any directory, 
+<tt style="color:limegreen">ang-tangle</tt> will also take
+`.json` files in any directory,
 and  make them available via a service named `data`.
-The `data` service is an object whose properties are the names 
+The `data` service is an object whose properties are the names
 of the `.json` files relative to the input directory,
 and values are the `JSON.parse()`d objects of those files.
 
@@ -73,20 +73,20 @@ the `AngTangle` object
 --------------------------------------------------------------------------------
 
 Your scripts have access to a object named `AngTangle`.  The `AngTangle` object
-has the same methods as the 
+has the same methods as the
 [angular `module` object](http://docs.angularjs.org/api/angular.Module), and is
 bound to the module you create in the `init` script.
 
 There is one additional method on the `AngTangle` object - `module()`, which
-is used to create the module in `init` script.  The signature is the same 
+is used to create the module in `init` script.  The signature is the same
 as the [`angular.module()`](http://docs.angularjs.org/api/angular.module)
-function.  
+function.
 
 You should create your angular module with:
 
     AngTangle.module(name[, requires], configFn)
 
-just like you do with `angular.module()`.  
+just like you do with `angular.module()`.
 
 If you call the `module()` function with no arguments, it will
 return the module you previously created with `AngTangle.module(...)`.
@@ -109,12 +109,12 @@ usage
 --------------------------------------------------------------------------------
 
     ang-tangle [options] input-directory output-file
-        
+
         input-directory is a directory of files to ang-tangle-ize
         output-file     is the name of the file to be generated
-    
+
     options:
-    
+
         -v --verbose     be verbose
 
 
@@ -122,7 +122,7 @@ usage
 samples
 --------------------------------------------------------------------------------
 
-There are two sample applications available with the project.  Check the 
+There are two sample applications available with the project.  Check the
 [samples directory](https://github.com/pmuellr/ang-tangle/tree/master/samples).
 
 You should be able to run the finished samples in your browser using the
@@ -136,7 +136,7 @@ awesome [rawgithub.com service](https://rawgithub.com/).
 building <tt style="color:limegreen">ang-tangle</tt>
 --------------------------------------------------------------------------------
 
-To hack on <tt style="color:limegreen">ang-tangle</tt> code itself, you should first install 
+To hack on <tt style="color:limegreen">ang-tangle</tt> code itself, you should first install
 [`jbuild`](https://github.com/pmuellr/jbuild).  Then run
 `npm install`, or course.
 

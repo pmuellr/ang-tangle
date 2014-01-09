@@ -11,7 +11,7 @@ AngTangle.service class Logger
 
     #---------------------------------------------------------------------------
     verbose: (value) ->
-        return @_verbose if !value? 
+        return @_verbose if !value?
 
         @_verbose = !!value
         return @_verbose

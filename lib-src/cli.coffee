@@ -13,10 +13,10 @@ cli = exports
 
 #-------------------------------------------------------------------------------
 cli.main = (args) ->
-    help() if args.length is 0 
+    help() if args.length is 0
     help() if args[0] in ["?", "-?", "--?"]
 
-    opts = 
+    opts =
         verbose: [ "v", Boolean ]
         help:    [ "h", Boolean ]
 
@@ -24,7 +24,7 @@ cli.main = (args) ->
     shortOpts = {}
     for name, opt of opts
         shortOpts[opt[0]] = "--#{name}" for name, opt of opts
-        longOpts[name]    = opt[1] 
+        longOpts[name]    = opt[1]
 
     parsed = nopt longOpts, shortOpts, args, 0
 
@@ -33,8 +33,8 @@ cli.main = (args) ->
     args = parsed.argv.remain
     opts = _.pick parsed, _.keys longOpts
 
-    help() if args.length is 0 
-    
+    help() if args.length is 0
+
     angTangle.run args, opts
 
     return
@@ -43,15 +43,15 @@ cli.main = (args) ->
 help = ->
     console.log """
         #{pkg.name} [options] input-directory output-file
-        
+
             input-directory is a directory of files to ang-tangle-ize
             output-file     is the name of the file to be generated
-        
+
         options:
-        
+
             -v --verbose     be verbose
-        
-        version: #{pkg.version}; for more info: #{pkg.homepage}    
+
+        version: #{pkg.version}; for more info: #{pkg.homepage}
     """
 
     process.exit 1
@@ -61,14 +61,14 @@ cli.main.call null, (process.argv.slice 2) if require.main is module
 
 
 #-------------------------------------------------------------------------------
-# Copyright 2013 Patrick Mueller
-# 
+# Copyright 2014 Patrick Mueller
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.

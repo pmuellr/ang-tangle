@@ -1,12 +1,12 @@
 # Licensed under the Apache License. See footer for details.
 
-AngTangle = 
+AngTangle =
 
     OneArgMethods: [
         "config"
         "run"
     ]
-    
+
     TwoArgMethods: [
         "animation"
         "constant"
@@ -26,12 +26,12 @@ class AngTangle.Init
     #---------------------------------------------------------------------------
     constructor: ->
 
-        getOneArgFunction = (module, method) -> 
+        getOneArgFunction = (module, method) ->
             (thing) ->
                 throw Error "module not defined in init script" unless module?
                 module[method].call module, thing
 
-        getTwoArgFunction = (module, method) -> 
+        getTwoArgFunction = (module, method) ->
             (name, thing) ->
                 throw Error "module not defined in init script" unless module?
                 module[method].call module, name, thing
@@ -59,12 +59,12 @@ class AngTangle.Script
     #---------------------------------------------------------------------------
     constructor: (@module, @scriptName) ->
 
-        getOneArgFunction = (module, method) -> 
+        getOneArgFunction = (module, method) ->
             (thing) ->
                 throw Error "module not defined in init script" unless module?
                 module[method].call module, thing
 
-        getTwoArgFunction = (module, method, scriptName) -> 
+        getTwoArgFunction = (module, method, scriptName) ->
             (name, thing) ->
                 unless thing
                     thing = name
@@ -86,14 +86,14 @@ class AngTangle.Script
         return @module
 
 #-------------------------------------------------------------------------------
-# Copyright 2013 Patrick Mueller
-# 
+# Copyright 2014 Patrick Mueller
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.

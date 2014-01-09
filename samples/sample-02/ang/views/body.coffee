@@ -5,9 +5,9 @@ AngTangle.controller body = ($scope, Logger) ->
 
     subTitle = ""
 
-    $scope.getSubtitle = -> 
+    $scope.getSubtitle = ->
         return "" if subTitle is ""
         return ": #{subTitle}"
 
-    $scope.setSubtitle = (s) -> 
+    $scope.setSubtitle = (s) ->
         subTitle = s

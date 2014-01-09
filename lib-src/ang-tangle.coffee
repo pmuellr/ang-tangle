@@ -384,7 +384,7 @@ align.left  = (s, len, pad=" ") -> align s, "left",  len, pad
 align.right = (s, len, pad=" ") -> align s, "right", len, pad
 
 #-------------------------------------------------------------------------------
-# Copyright 2013 Patrick Mueller
+# Copyright 2014 Patrick Mueller
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
