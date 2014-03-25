@@ -135,7 +135,7 @@ AngTangle.config(function($routeProvider, views) {
 ;(function(AngTangle) {
 AngTangle.controller(function($scope) {
   return $scope.text = {
-    world: "WORLD!!!"
+    world: "WORLD"
   };
 });
 
@@ -156,7 +156,7 @@ AngTangle.constant('data', {});
 //----- --views--.coffee
 ;(function(AngTangle) {
 AngTangle.constant('views', {
-  "views/hello": "<p>Hello, <span ng-bind=\"text.world\"></span>",
+  "views/hello": "<p>Hello, <span ng-bind=\"text.world\"></span>!!!</p>\n<p>Lots going on here:</p>\n<ul>\n<li>markdown for markup</li>\n<li>using <i>html</i> tags IN the markup</li>\n<li>it&#39;s github-flavored, so supports tables</li>\n</ul>\n<table>\n<thead>\n<tr>\n<th align=\"left\">col1</th>\n<th align=\"right\">col2</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"left\">a</td>\n<td align=\"right\">1.1</td>\n</tr>\n<tr>\n<td align=\"left\">b</td>\n<td align=\"right\">2.2</td>\n</tr>\n<tr>\n<td align=\"left\">c</td>\n<td align=\"right\">3.3</td>\n</tr>\n</tbody>\n</table>\n",
   "views/home": "<p>Welcome to the home page!"
 });
 

@@ -145,10 +145,6 @@ coffeec = (src, out) ->
     coffee "--compile --bare --output #{out} #{src}/*.coffee"
 
 #-------------------------------------------------------------------------------
-coffee = (cmd) ->
-    pexec "coffee #{cmd}"
-
-#-------------------------------------------------------------------------------
 # Copyright 2014 Patrick Mueller
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

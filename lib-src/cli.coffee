@@ -23,7 +23,7 @@ cli.main = (args) ->
     longOpts  = {}
     shortOpts = {}
     for name, opt of opts
-        shortOpts[opt[0]] = "--#{name}" for name, opt of opts
+        shortOpts[opt[0]] = "--#{name}"
         longOpts[name]    = opt[1]
 
     parsed = nopt longOpts, shortOpts, args, 0

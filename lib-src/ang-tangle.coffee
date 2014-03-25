@@ -38,7 +38,6 @@ main = (iDir, oFile, options) ->
     logv "oFile:    #{oFile}"
     logv "oFileMap: #{oFileMap}"
     logv "options:  #{JSON.stringify options, null, 4}"
-    logv ""
 
     fileNames = sh.ls "-R", iDir
 
@@ -86,12 +85,12 @@ main = (iDir, oFile, options) ->
 
     out.push "//# sourceMappingURL=#{path.basename oFileMap}\n"
 
-    log "generating: #{oFile}"
+    logv "generating: #{oFile}"
 
     sh.mkdir "-p", path.dirname(oFile)
     fs.writeFileSync oFile, out.join ""
 
-    log "generating: #{oFileMap}"
+    logv "generating: #{oFileMap}"
 
     content = out.sourceNode.toStringWithSourceMap file: path.basename(oFile)
     content = "#{content.map}"
@@ -233,7 +232,7 @@ processViews = (iDir, files) ->
         tables:         true
         breaks:         false
         pedantic:       false
-        sanitize:       true
+        sanitize:       false
         smartLists:     true
         smartypants:    false
 
